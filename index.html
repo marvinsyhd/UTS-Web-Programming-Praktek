@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JerseyKing – Toko Jersey Online</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- ===== MODAL KONFIRMASI HAPUS ===== -->
+  <div id="modal-overlay" class="modal-overlay" onclick="tutupModal()">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-icon">🗑️</div>
+      <h3 class="modal-title">Hapus dari Keranjang?</h3>
+      <p class="modal-desc">
+        Anda akan menghapus <strong id="modal-nama-produk"></strong>
+        dari keranjang belanja. Tindakan ini tidak dapat dibatalkan.
+      </p>
+      <div class="modal-actions">
+        <button class="modal-btn-batal" onclick="tutupModal()">BATAL</button>
+        <button class="modal-btn-hapus" onclick="konfirmasiHapus()">YA, HAPUS</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HEADER ===== -->
+  <header>
+    <div class="header-inner">
+      <div class="logo"> Jersey<span class="logo-merah">King</span><span class="logo-emas">.id</span></div>
+      <nav>
+        <button class="nav-toggle" onclick="toggleNav()">&#9776;</button>
+        <ul id="nav-menu">
+          <li><a href="#beranda" onclick="tutupNav()">Beranda</a></li>
+          <li><a href="#produk" onclick="tutupNav()">Produk</a></li>
+          <li><a href="#beli" onclick="tutupNav()">Pembelian</a></li>
+          <li><a href="#tentang" onclick="tutupNav()">Tentang</a></li>
+        </ul>
+      </nav>
+      <button class="header-cart-btn" onclick="bukaKeranjang()">
+        🛒 Keranjang <span class="cart-badge" id="cart-badge">0</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===== HALAMAN KERANJANG ===== -->
+    <section id="halaman-keranjang" class="hidden">
+      <div class="keranjang-header">
+        <button class="btn-kembali" onclick="tutupKeranjang()">&#8592; Kembali Belanja</button>
+        <h2 class="keranjang-title">Keranjang Belanja</h2>
+        <p class="keranjang-sub">Produk pilihan Anda sebelum melanjutkan ke pembelian</p>
+        <div class="keranjang-divider"></div>
+      </div>
+      <div id="keranjang-list"></div>
+      <div id="keranjang-empty" class="keranjang-empty hidden">
+        <div class="empty-icon">🛒</div>
+        <p>Keranjang Anda masih kosong.</p>
+        <button class="btn-hero" style="display:inline-block;margin-top:1rem;" onclick="tutupKeranjang()">Mulai
+          Belanja</button>
+      </div>
+      <div id="keranjang-footer" class="keranjang-total-box hidden">
+        <div>
+          <div class="total-label">TOTAL BELANJA</div>
+          <div class="total-harga" id="total-harga">Rp 0</div>
+        </div>
+        <button class="btn-checkout" onclick="checkout()">LANJUT KE PEMBELIAN &rarr;</button>
+      </div>
+    </section>
+
+    <!-- ===== KONTEN UTAMA ===== -->
+    <div id="konten-utama">
+
+      <section id="beranda">
+        <h1>Jersey <span class="gold">Original</span> Terbaik</h1>
+        <p>Koleksi jersey klub sepak bola dunia — resmi, berkualitas, siap kirim ke seluruh Indonesia.</p>
+        <div class="hero-badges">
+          <span class="hero-badge">Premier League</span>
+          <span class="hero-badge">La Liga</span>
+          <span class="hero-badge">Bundesliga</span>
+          <span class="hero-badge">Liga 1</span>
+        </div>
+        <a href="#produk" class="btn-hero">Lihat Koleksi</a>
+        <a href="#beli" class="btn-hero-outline">Pesan Sekarang</a>
+      </section>
+
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-num" id="stat-produk">6</div>
+          <div class="stat-label">Jersey Tersedia</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">50+</div>
+          <div class="stat-label">Klub Tersedia</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">12K+</div>
+          <div class="stat-label">Jersey Terjual</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">4.9 ⭐</div>
+          <div class="stat-label">Rating Pembeli</div>
+        </div>
+      </div>
+
+      <section id="produk">
+        <h2 class="section-title">Koleksi Jersey</h2>
+        <div class="produk-controls">
+          <input type="text" id="input-produk" placeholder="Nama jersey baru (misal: Arsenal Home 24/25)..." />
+          <button class="btn-add" onclick="tambahProduk()">+ Tambah Jersey</button>
+        </div>
+        <div class="keranjang-bar">
+          <span>🛒 Keranjang: <strong id="keranjang-count">0</strong> item</span>
+          <button class="btn-keranjang-clear" onclick="bukaKeranjang()">Lihat Keranjang &rarr;</button>
+        </div>
+        <div id="produk-grid"></div>
+      </section>
+
+      <section id="beli">
+        <h2 class="section-title">Form Pembelian Jersey</h2>
+        <div class="form-card">
+          <div class="form-grid">
+            <div class="form-group" id="grp-nama">
+              <label for="nama">Nama Lengkap *</label>
+              <input type="text" id="nama" placeholder="Nama penerima" />
+              <span class="error-msg" id="err-nama"></span>
+            </div>
+            <div class="form-group" id="grp-telepon">
+              <label for="telepon">No. WhatsApp *</label>
+              <input type="number" id="telepon" placeholder="08xxxxxxxxxx" />
+              <span class="error-msg" id="err-telepon"></span>
+            </div>
+          </div>
+          <div class="form-group" id="grp-email">
+            <label for="email">Alamat Email *</label>
+            <input type="email" id="email" placeholder="email@contoh.com" />
+            <span class="error-msg" id="err-email"></span>
+          </div>
+          <div class="form-group" id="grp-password">
+            <label for="password">Buat Password Akun *</label>
+            <input type="password" id="password" placeholder="Minimal 6 karakter" />
+            <span class="error-msg" id="err-password"></span>
+          </div>
+          <div class="divider"></div>
+          <div class="form-grid">
+            <div class="form-group" id="grp-jersey">
+              <label for="jersey">Pilih Jersey *</label>
+              <select id="jersey">
+                <option value="">-- Pilih Jersey --</option>
+                <option>Manchester City Home</option>
+                <option>Real Madrid Away</option>
+                <option>Barcelona Third</option>
+                <option>Liverpool Home</option>
+                <option>PSG Away</option>
+                <option>Bayern Munich Home</option>
+                <option>Persija Jakarta</option>
+                <option>Bali United Home</option>
+              </select>
+              <span class="error-msg" id="err-jersey"></span>
+            </div>
+            <div class="form-group" id="grp-ukuran">
+              <label for="ukuran">Ukuran *</label>
+              <select id="ukuran">
+                <option value="">-- Ukuran --</option>
+                <option>S</option>
+                <option>M</option>
+                <option>L</option>
+                <option>XL</option>
+                <option>XXL</option>
+              </select>
+              <span class="error-msg" id="err-ukuran"></span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="nama-punggung">Nama Punggung / Printing (Opsional)</label>
+            <input type="text" id="nama-punggung" placeholder="Kosongkan jika tidak ingin printing nama" />
+          </div>
+          <div class="form-group" id="grp-harga">
+            <label for="harga">Harga (Rp) *</label>
+            <input type="number" id="harga" placeholder="Contoh: 350000" min="1" />
+            <span class="error-msg" id="err-harga"></span>
+          </div>
+          <div class="form-group" id="grp-pembayaran">
+            <label>Metode Pembayaran *</label>
+            <div class="radio-group">
+              <label><input type="radio" name="pembayaran" value="Transfer BCA" /> Transfer BCA</label>
+              <label><input type="radio" name="pembayaran" value="DANA" /> DANA</label>
+              <label><input type="radio" name="pembayaran" value="GoPay" /> GoPay</label>
+              <label><input type="radio" name="pembayaran" value="COD" /> COD</label>
+            </div>
+            <span class="error-msg" id="err-pembayaran"></span>
+          </div>
+          <div class="form-group" id="grp-alamat">
+            <label for="alamat">Alamat Pengiriman *</label>
+            <textarea id="alamat" rows="3" placeholder="Jl. Nama Jalan, No. XX, Kelurahan, Kota, Kode Pos"></textarea>
+            <span class="error-msg" id="err-alamat"></span>
+          </div>
+          <div class="form-group" id="grp-syarat">
+            <div class="checkbox-wrapper">
+              <input type="checkbox" id="syarat" />
+              <label for="syarat">Saya telah memeriksa pesanan dan menyetujui syarat &amp; ketentuan JerseyKing.id
+                *</label>
+            </div>
+            <span class="error-msg" id="err-syarat"></span>
+          </div>
+          <button class="btn-submit" onclick="submitForm()">⚽ Konfirmasi Pembelian</button>
+          <div class="form-success" id="form-success">
+            ✅ Pesanan berhasil! Tim JerseyKing.id akan menghubungi Anda via WhatsApp dalam 1x24 jam. Terima kasih!
+          </div>
+        </div>
+      </section>
+
+      <section id="tentang">
+        <h2 class="section-title">Kenapa JerseyKing?</h2>
+        <div class="about-grid">
+          <div class="about-card">
+            <div class="about-icon">✅</div>
+            <h3>100% Original</h3>
+            <p>Semua produk bergaransi keaslian dari distributor resmi.</p>
+          </div>
+          <div class="about-card">
+            <div class="about-icon">🚀</div>
+            <h3>Pengiriman Cepat</h3>
+            <p>Dikirim 1–3 hari kerja via JNE, J&amp;T, dan SiCepat.</p>
+          </div>
+          <div class="about-card">
+            <div class="about-icon">🖨️</div>
+            <h3>Custom Printing</h3>
+            <p>Nama &amp; nomor punggung favorit dengan harga terjangkau.</p>
+          </div>
+          <div class="about-card">
+            <div class="about-icon">🔄</div>
+            <h3>Garansi Retur</h3>
+            <p>Produk cacat atau salah ukuran? Kami ganti dalam 7 hari.</p>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- #konten-utama -->
+  </main>
+
+  <footer>
+    <div class="footer-links">
+      <a href="#beranda">Beranda</a>
+      <a href="#produk">Produk</a>
+      <a href="#beli">Pembelian</a>
+      <a href="#tentang">Tentang Kami</a>
+    </div>
+    <p>&copy; 2025 <strong>JerseyKing.id</strong> — Toko Jersey Online Terpercaya Indonesia</p>
+    <p class="footer-sub">UTS Praktikum Web Dasar – UMSU Fakultas Ilmu Komputer &amp; Teknologi Informasi</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
